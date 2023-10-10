@@ -52,6 +52,13 @@ class DreamLogs(Resource):
         return response
 
 
+class DreamLogsByID(Resource):
+    def get(self, id):
+        dream_log = DreamLog.query.filter_by(id=id).first()
+        response = make_response(dream_log_singular_schema.dump(dream_log), 200)
+        return response
+
+
 class TagSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Tag
@@ -93,6 +100,7 @@ class DreamTags(Resource):
 
 api.add_resource(Users, '/users')
 api.add_resource(DreamLogs, '/dream-logs')
+api.add_resource(DreamLogsByID, '/dream-logs/<int:id>')
 api.add_resource(Tags, '/tags')
 api.add_resource(DreamTags, '/dream-tags')
 
