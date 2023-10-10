@@ -2,14 +2,14 @@
 from flask import Flask, request, make_response, session
 from flask_restful import Api, Resource
 from marshmallow import validate, fields
-from config import api, app, db, ma
+from config import api, app, db, ma, bcrypt
 from models import User, DreamLog, Tag, DreamTag
 from dotenv import load_dotenv
-from werkzeug.security import check_password_hash
 import os
 
 load_dotenv()
 secret_key = os.environ.get('SECRET_KEY')
+app.secret_key = secret_key
 
 
 # Schemas paired with respective classes
@@ -34,24 +34,29 @@ class Users(Resource):
         response = make_response(user_plural_schema.dump(users), 200)
         return response
 
-    def post(self):
-        try:
-            data = request.json
-            user_data = user_singular_schema.load(data)
+    class Users(Resource):
+        def post(self):
+            try:
+                data = request.json
+                user_data = user_singular_schema.load(data)
 
-            new_user = User(
-                username=user_data["username"],
-                password_hash=user_data.get("password", ""),
-            )
-            db.session.add(new_user)
-            db.session.commit()
+                hashed_password = bcrypt.generate_password_hash(
+                    user_data.get("password", "")
+                ).decode('utf-8')
 
-            response = user_singular_schema.dump(new_user), 201
-            return response
-        except Exception:
-            return {
-                "message": "Failed to create user, ensure a non duplicate username."
-            }, 400
+                new_user = User(
+                    username=user_data["username"],
+                    password_hash=hashed_password,
+                )
+                db.session.add(new_user)
+                db.session.commit()
+
+                response = user_singular_schema.dump(new_user), 201
+                return response
+            except Exception:
+                return {
+                    "message": "Failed to create user, ensure a non duplicate username."
+                }, 400
 
 
 class UsersByID(Resource):
@@ -188,7 +193,7 @@ class Login(Resource):
 
         user = User.query.filter_by(username=username).first()
 
-        if not user or not check_password_hash(user.password_hash, password):
+        if not user or not bcrypt.check_password_hash(user.password_hash, password):
             return {"message": "Bad username or password"}, 401
 
         session['user_id'] = user.id
