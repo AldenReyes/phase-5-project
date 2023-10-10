@@ -44,5 +44,30 @@ class DreamLog(db.Model):
     user_id = db.Column(db.Integer, ForeignKey('users.id'))
     user = db.relationship('User', back_populates="dream_logs")
 
+    tags = db.relationship('Tag', secondary='dream_tags', back_populates='dream_logs')
+
     def __repr__(self):
         return f'Dream_log_ID {self.id}, is_public {True if self.is_public == 1 else False} published at {self.published_at}'
+
+
+class Tag(db.Model):
+    __tablename__ = 'tags'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+
+    dream_logs = db.relationship(
+        'Dream_log', secondary='dream_tags', back_populates='tags'
+    )
+
+    def __repr__(self):
+        return f'Tag_ID {self.id}, name {self.name}'
+
+
+class DreamTag(db.Model):
+    # Joint table
+    __tablename__ = 'dream_tags'
+
+    id = db.Column(db.Integer, primary_key=True)
+    dream_log_id = db.Column(db.Integer, ForeignKey('dream_logs.id'), nullable=False)
+    tag_id = db.Column(db.Integer, ForeignKey('tags.id'), nullable=False)
