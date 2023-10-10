@@ -14,3 +14,4 @@
 .env.local
 .env.development.local
 .env.test.local
+server/instance/app.db
