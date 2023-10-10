@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
-from flask import Flask, request, make_response
-from flask_restful import Resource
+from flask import Flask, request, make_response, session
 from flask_restful import Api, Resource
 from marshmallow import validate, fields
 from config import api, app, db, ma
 from models import User, DreamLog, Tag, DreamTag
+from dotenv import load_dotenv
+from werkzeug.security import check_password_hash
+import os
+
+load_dotenv()
+secret_key = os.environ.get('SECRET_KEY')
 
 
+# Schemas paired with respective classes
 class UserSchema(ma.SQLAlchemySchema):
     class Meta:
         model = User
@@ -91,11 +97,46 @@ class DreamLogs(Resource):
         response = make_response(dream_log_plural_schema.dump(dream_logs), 200)
         return response
 
+    def post(self):
+        if "user_id" not in session:
+            return {"message": "You must be logged in to post a dream log"}, 401
+
+        user_id = session["user_id"]
+
+        data = request.json
+        dream_log_data = dream_log_singular_schema.load(data)
+
+        new_dream_log = DreamLog(
+            title=dream_log_data["title"],
+            text_content=dream_log_data["text_content"],
+            is_public=dream_log_data["is_public"],
+            rating=dream_log_data.get("rating", None),
+            user_id=user_id,
+        )
+        db.session.add(new_dream_log)
+        db.session.commit()
+
+        response = make_response(dream_log_singular_schema.dump(new_dream_log), 201)
+        return response
+
 
 class DreamLogsByID(Resource):
     def get(self, id):
         dream_log = DreamLog.query.filter_by(id=id).first()
         response = make_response(dream_log_singular_schema.dump(dream_log), 200)
+        return response
+
+    def patch(self, id):
+        record = DreamLog.query.filter_by(id=id).first()
+
+        for attr in request.form:
+            setattr(record, attr, request.form[attr])
+
+        db.session.add(record)
+        db.session.commit()
+
+        response = make_response(dream_log_singular_schema.dump(record), 200)
+
         return response
 
 
@@ -138,12 +179,37 @@ class DreamTags(Resource):
         return response
 
 
+# Authentication handling
+class Login(Resource):
+    def post(self):
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
+
+        user = User.query.filter_by(username=username).first()
+
+        if not user or not check_password_hash(user.password_hash, password):
+            return {"message": "Bad username or password"}, 401
+
+        session['user_id'] = user.id
+        return make_response(user_singular_schema.dump(user), 200)
+
+
+class Logout(Resource):
+    def delete(self):
+        session['user_id'] = None
+        return make_response({}, 204)
+
+
 api.add_resource(Users, '/users')
 api.add_resource(UsersByID, '/users/<int:id>')
 api.add_resource(DreamLogs, '/dream-logs')
 api.add_resource(DreamLogsByID, '/dream-logs/<int:id>')
 api.add_resource(Tags, '/tags')
 api.add_resource(DreamTags, '/dream-tags')
+
+api.add_resource(Login, '/login')
+api.add_resource(Logout, '/logout')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
