@@ -26,7 +26,9 @@ with app.app_context():
                 title=fake.sentence(),
                 text_content=fake.text(max_nb_chars=500),
                 is_public=fake.boolean(),
-                rating=fake.random_element(["Good", "Bad", "Neutral"]),
+                rating=fake.random_element(
+                    ["Good Dream", "Bad Dream", "Neutral Dream"]
+                ),
                 user=fake.random_element(users),
             )
             db.session.add(dream_log)
