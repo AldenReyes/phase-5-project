@@ -2,6 +2,7 @@
 from flask import Flask, request, make_response
 from flask_restful import Resource
 from flask_restful import Api, Resource
+from marshmallow import validate, fields
 from config import app, ma, api
 from models import User, DreamLog, Tag, DreamTag
 
@@ -11,7 +12,7 @@ class UserSchema(ma.SQLAlchemySchema):
         model = User
 
     id = ma.auto_field()
-    username = ma.auto_field()
+    username = fields.Str(required=True, validate=validate.Length(min=4, max=30))
 
 
 user_singular_schema = UserSchema()
@@ -30,10 +31,12 @@ class DreamLogSchema(ma.SQLAlchemySchema):
         model = DreamLog
 
     id = ma.auto_field()
-    title = ma.auto_field()
-    text_content = ma.auto_field()
-    is_public = ma.auto_field()
-    rating = ma.auto_field()
+    title = fields.Str(required=True, validate=validate.Length(min=1, max=50))
+    text_content = fields.Str(required=True, validate=validate.Length(max=500))
+    is_public = fields.Bool(required=True)
+    rating = fields.Str(
+        validate=validate.OneOf(["Good Dream", "Neutral Dream", "Bad Dream"])
+    )
 
     published_at = ma.auto_field()
     edited_at = ma.auto_field()
@@ -64,7 +67,7 @@ class TagSchema(ma.SQLAlchemySchema):
         model = Tag
 
     id = ma.auto_field()
-    name = ma.auto_field()
+    name = fields.Str(required=True, validate=validate.Length(min=1, max=30))
 
 
 tag_singular_schema = TagSchema()
