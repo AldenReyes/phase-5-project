@@ -3,7 +3,7 @@ from flask import Flask, request, make_response
 from flask_restful import Resource
 from flask_restful import Api, Resource
 from marshmallow import validate, fields
-from config import app, ma, api
+from config import api, app, db, ma
 from models import User, DreamLog, Tag, DreamTag
 
 
@@ -13,6 +13,9 @@ class UserSchema(ma.SQLAlchemySchema):
 
     id = ma.auto_field()
     username = fields.Str(required=True, validate=validate.Length(min=4, max=30))
+    password = fields.Str(
+        load_only=True, required=True, validate=validate.Length(min=8)
+    )
 
 
 user_singular_schema = UserSchema()
@@ -23,6 +26,40 @@ class Users(Resource):
     def get(self):
         users = User.query.all()
         response = make_response(user_plural_schema.dump(users), 200)
+        return response
+
+    def post(self):
+        try:
+            data = request.json
+            user_data = user_singular_schema.load(data)
+
+            new_user = User(
+                username=user_data["username"],
+                password_hash=user_data.get("password", ""),
+            )
+            db.session.add(new_user)
+            db.session.commit()
+
+            response = user_singular_schema.dump(new_user), 201
+            return response
+        except Exception:
+            return {
+                "message": "Failed to create user, ensure a non duplicate username."
+            }, 400
+
+
+class UsersByID(Resource):
+    def get(self, id):
+        user = User.query.filter_by(id=id).first()
+        response = make_response(user_singular_schema.dump(user), 200)
+        return response
+
+    def delete(self, id):
+        user = User.query.filter_by(id=id).first()
+        db.session.delete(user)
+        db.session.commit()
+
+        response = {"message": "user successfully deleted"}
         return response
 
 
@@ -102,6 +139,7 @@ class DreamTags(Resource):
 
 
 api.add_resource(Users, '/users')
+api.add_resource(UsersByID, '/users/<int:id>')
 api.add_resource(DreamLogs, '/dream-logs')
 api.add_resource(DreamLogsByID, '/dream-logs/<int:id>')
 api.add_resource(Tags, '/tags')
