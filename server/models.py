@@ -1,7 +1,6 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from app import bcrypt
-from config import db
+from config import db, bcrypt
 
 
 class User(db.Model):
@@ -11,7 +10,7 @@ class User(db.Model):
     username = db.Column(db.String(30), unique=True)
     _password_hash = db.Column(db.String, nullable=False)
 
-    dream_logs_id = db.relationship('Dream_log', back_populates="user")
+    dream_logs = db.relationship('DreamLog', back_populates="user")
 
     def __repr__(self):
         return f'User_ID {self.id}, username {self.username}'
@@ -57,7 +56,7 @@ class Tag(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
 
     dream_logs = db.relationship(
-        'Dream_log', secondary='dream_tags', back_populates='tags'
+        'DreamLog', secondary='dream_tags', back_populates='tags'
     )
 
     def __repr__(self):
