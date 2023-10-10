@@ -132,17 +132,24 @@ class DreamLogsByID(Resource):
         return response
 
     def patch(self, id):
-        record = DreamLog.query.filter_by(id=id).first()
+        dream_log = DreamLog.query.filter_by(id=id).first()
 
         for attr in request.form:
-            setattr(record, attr, request.form[attr])
+            setattr(dream_log, attr, request.form[attr])
 
-        db.session.add(record)
+        db.session.add(dream_log)
         db.session.commit()
 
-        response = make_response(dream_log_singular_schema.dump(record), 200)
+        response = make_response(dream_log_singular_schema.dump(dream_log), 200)
 
         return response
+
+    def delete(self, id):
+        dream_log = DreamLog.query.filter_by(id=id).first()
+        db.session.delete(dream_log)
+        db.session.commit()
+
+        return make_response({"message": "Dream log deleted successfully"})
 
 
 class TagSchema(ma.SQLAlchemySchema):
