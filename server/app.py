@@ -6,7 +6,7 @@ from config import app, ma, api
 from models import User, DreamLog, Tag, DreamTag
 
 
-class UserSchema(ma.SQLAlchemyAutoSchema):
+class UserSchema(ma.SQLAlchemySchema):
     class Meta:
         model = User
 
@@ -25,7 +25,7 @@ class Users(Resource):
         return response
 
 
-class DreamLogSchema(ma.SQLAlchemyAutoSchema):
+class DreamLogSchema(ma.SQLAlchemySchema):
     class Meta:
         model = DreamLog
 
@@ -38,7 +38,7 @@ class DreamLogSchema(ma.SQLAlchemyAutoSchema):
     published_at = ma.auto_field()
     edited_at = ma.auto_field()
 
-    user_id = ma.auto_field()
+    user = ma.Nested(user_singular_schema)
 
 
 dream_log_singular_schema = DreamLogSchema()
@@ -52,7 +52,7 @@ class DreamLogs(Resource):
         return response
 
 
-class TagSchema(ma.SQLAlchemyAutoSchema):
+class TagSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Tag
 
@@ -71,7 +71,7 @@ class Tags(Resource):
         return response
 
 
-class DreamTagSchema(ma.SQLAlchemyAutoSchema):
+class DreamTagSchema(ma.SQLAlchemySchema):
     class Meta:
         model = DreamTag
 
