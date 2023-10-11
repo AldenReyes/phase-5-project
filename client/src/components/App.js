@@ -4,7 +4,7 @@ import Navbar from "./Navbar";
 import Home from "./Home";
 import Login from "./Login";
 import Signup from "./Signup";
-import DreamLogs from "./DreamLogs";
+import DreamLogs from "./PublicDreamLogs";
 import PersonalLogs from "./PersonalLogs";
 import CreateLog from "./CreateLog";
 import About from "./About";
