@@ -4,12 +4,6 @@ from flask_restful import Api, Resource
 from marshmallow import validate, fields
 from config import api, app, db, ma, bcrypt
 from models import User, DreamLog, Tag, DreamTag
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-secret_key = os.environ.get('SECRET_KEY')
-app.secret_key = secret_key
 
 
 # Schemas paired with respective classes
@@ -34,29 +28,24 @@ class Users(Resource):
         response = make_response(user_plural_schema.dump(users), 200)
         return response
 
-    class Users(Resource):
-        def post(self):
-            try:
-                data = request.json
-                user_data = user_singular_schema.load(data)
+    def post(self):
+        try:
+            data = request.json
+            user_data = data
 
-                hashed_password = bcrypt.generate_password_hash(
-                    user_data.get("password", "")
-                ).decode('utf-8')
+            new_user = User(
+                username=user_data["username"],
+                password_hash=user_data["password"],
+            )
+            db.session.add(new_user)
+            db.session.commit()
 
-                new_user = User(
-                    username=user_data["username"],
-                    password_hash=hashed_password,
-                )
-                db.session.add(new_user)
-                db.session.commit()
-
-                response = user_singular_schema.dump(new_user), 201
-                return response
-            except Exception:
-                return {
-                    "message": "Failed to create user, ensure a non duplicate username."
-                }, 400
+            response = user_singular_schema.dump(new_user)
+            return make_response(response, 201)
+        except Exception:
+            return {
+                "message": "Failed to create user, ensure a non duplicate username."
+            }, 400
 
 
 class UsersByID(Resource):
@@ -170,6 +159,23 @@ class Tags(Resource):
         response = make_response(tag_plural_schema.dump(tags))
         return response
 
+    def post(self):
+        try:
+            data = request.json
+            tag_data = tag_singular_schema.load(data)
+
+            new_tag = Tag(
+                name=tag_data["name"],
+            )
+
+            db.session.add(new_tag)
+            db.session.commit()
+
+            response = tag_singular_schema.dump(new_tag)
+            return make_response(response, 201)
+        except Exception:
+            return {"message": f"Failed to create tag: {Exception}"}, 400
+
 
 class DreamTagSchema(ma.SQLAlchemySchema):
     class Meta:
@@ -190,8 +196,63 @@ class DreamTags(Resource):
         response = make_response(dream_tag_plural_schema.dump(dream_tags))
         return response
 
+    def post(self):
+        try:
+            data = request.json
+            dream_tag_data = dream_tag_singular_schema.load(data)
+
+            new_dream_tag = DreamTag(
+                dream_log_id=dream_tag_data["dream_log_id"],
+                tag_id=dream_tag_data["tag_id"],
+            )
+
+            db.session.add(new_dream_tag)
+            db.session.commit()
+
+            response = make_response(dream_tag_singular_schema.dump(new_dream_tag), 201)
+            return response
+        except Exception:
+            return {"message": f"Failed to create DreamTag: {Exception}"}, 400
+
+
+class DreamTagsByID(Resource):
+    def get(self, id):
+        dream_tag_by_id = DreamTag.query.filter_by(id=id).first()
+        response = make_response(dream_tag_by_id, 200)
+        return response
+
+    def delete(self, id):
+        dream_tag = DreamTag.query.filter_by(id=id).first()
+
+        if not dream_tag:
+            return {"message": "DreamTag not found"}, 404
+
+        db.session.delete(dream_tag)
+        db.session.commit()
+
+        return {"message": "DreamTag successfully deleted"}, 200
+
 
 # Authentication handling
+class Signup(Resource):
+    def post(self):
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
+
+        if username and password:
+            new_user = User(username=username)
+            new_user.password_hash = password
+            db.session.add(new_user)
+            db.session.commit()
+
+            session['user_id'] = new_user.id
+
+            return new_user.to_dict(), 201
+
+        return {"error": "Signup failed"}, 422
+
+
 class Login(Resource):
     def post(self):
         data = request.get_json()
@@ -200,11 +261,11 @@ class Login(Resource):
 
         user = User.query.filter_by(username=username).first()
 
-        if not user or not bcrypt.check_password_hash(user.password_hash, password):
-            return {"message": "Bad username or password"}, 401
-
-        session['user_id'] = user.id
-        return make_response(user_singular_schema.dump(user), 200)
+        if user.authenticate(password):
+            session['user_id'] = user.id
+            return make_response(user_singular_schema.dump(user), 200)
+        else:
+            return {"error": "Failed to login, check username or password"}, 401
 
 
 class Logout(Resource):
@@ -219,9 +280,11 @@ api.add_resource(DreamLogs, '/dream-logs')
 api.add_resource(DreamLogsByID, '/dream-logs/<int:id>')
 api.add_resource(Tags, '/tags')
 api.add_resource(DreamTags, '/dream-tags')
+api.add_resource(DreamTagsByID, '/dream-tags/<int:id>')
 
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
+api.add_resource(Signup, '/signup')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
