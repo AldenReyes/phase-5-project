@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import Navbar from "./Navbar";
 import Home from "./Home";
 import Login from "./Login";
@@ -9,6 +10,7 @@ import PersonalLogs from "./PersonalLogs";
 import CreateLog from "./CreateLog";
 import About from "./About";
 import "../styles/App.css";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
@@ -25,6 +27,7 @@ function App() {
           <Route path="/create" component={CreateLog} />
         </Switch>
       </BrowserRouter>
+      <ToastContainer />
     </div>
   );
 }
