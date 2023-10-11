@@ -1,7 +1,4 @@
-.home {
-  height: 70vh;
-  background-size: cover;
-  display: flex;
+.sign-up {
   justify-content: center;
   align-items: center;
   flex-direction: column;
