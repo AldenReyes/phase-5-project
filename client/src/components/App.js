@@ -8,7 +8,6 @@ import Signup from "./Signup";
 import DreamLogs from "./PublicDreamLogs";
 import PersonalLogs from "./PersonalLogs";
 import CreateLog from "./CreateLog";
-import About from "./About";
 import "../styles/App.css";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -22,7 +21,6 @@ function App() {
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Signup} />
           <Route path="/dreamlogs" component={DreamLogs} />
-          <Route path="/about" component={About} />
           <Route path="/personallogs" component={PersonalLogs} />
           <Route path="/create" component={CreateLog} />
         </Switch>
