@@ -4,6 +4,7 @@ from flask_restful import Api, Resource
 from marshmallow import validate, fields
 from config import api, app, db, ma, bcrypt
 from models import User, DreamLog, Tag, DreamTag
+from datetime import datetime, timedelta
 
 
 # Schemas paired with respective classes
@@ -290,7 +291,13 @@ class Login(Resource):
 class Logout(Resource):
     def delete(self):
         session['user_id'] = None
-        return make_response({}, 204)
+        response = make_response({}, 204)
+
+        response.set_cookie(
+            'username', '', expires=datetime.utcnow() - timedelta(days=1)
+        )
+
+        return response
 
 
 api.add_resource(Users, '/users')
