@@ -265,7 +265,7 @@ class Signup(Resource):
 
             session['user_id'] = new_user.id
 
-            return new_user.to_dict(), 201
+            return {"message": "Signup success"}, 201
 
         return {"error": "Signup failed"}, 422
 

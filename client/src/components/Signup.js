@@ -2,6 +2,7 @@ import React from "react";
 import { Formik, Form, ErrorMessage } from "formik";
 import { Button, Form as SemanticForm } from "semantic-ui-react";
 import { toast } from "react-toastify";
+import "../styles/Signup.css";
 
 const initialValues = {
   username: "",
@@ -36,7 +37,7 @@ function showSignUpFailure() {
 
 export default function SignUp() {
   return (
-    <div>
+    <div className="sign-up">
       <h2>Sign Up</h2>
       <Formik
         initialValues={initialValues}
@@ -53,7 +54,7 @@ export default function SignUp() {
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
-          fetch("/users", {
+          fetch("/signup", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
