@@ -14,7 +14,7 @@ function DreamLog({ log }) {
       </Card.Content>
       <Card.Content extra>
         <Icon name="user" />
-        {log.user["username"]}
+        {log.user["username"]} had a {log["rating"]}
       </Card.Content>
       <Card.Content extra>
         <div>
