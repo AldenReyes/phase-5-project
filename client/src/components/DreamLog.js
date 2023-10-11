@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, Icon } from "semantic-ui-react";
+import { Card, Icon, Label } from "semantic-ui-react";
+import { v4 as uuid } from "uuid";
 
 function DreamLog({ log }) {
   return (
@@ -14,6 +15,18 @@ function DreamLog({ log }) {
       <Card.Content extra>
         <Icon name="user" />
         {log.user["username"]}
+      </Card.Content>
+      <Card.Content extra>
+        <div>
+          <strong>Tags: </strong>
+          {log.tags && log.tags.length > 0
+            ? log.tags.map((tag) => (
+                <Label key={uuid()} color="blue">
+                  {tag.name}
+                </Label>
+              ))
+            : "No tags available"}
+        </div>
       </Card.Content>
     </Card>
   );

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, request, make_response, session
+from flask import Flask, request, make_response, session, jsonify
 from flask_restful import Api, Resource
 from marshmallow import validate, fields
 from config import api, app, db, ma, bcrypt
@@ -88,8 +88,21 @@ dream_log_plural_schema = DreamLogSchema(many=True)
 class DreamLogs(Resource):
     def get(self):
         public_dream_logs = DreamLog.query.filter_by(is_public=True).all()
-        response = make_response(dream_log_plural_schema.dump(public_dream_logs), 200)
-        return response
+        dream_logs_with_tags = []
+
+        for dream_log in public_dream_logs:
+            dream_tags = DreamTag.query.filter_by(dream_log_id=dream_log.id).all()
+            associated_tags = [
+                Tag.query.filter_by(id=dream_tag.tag_id).first()
+                for dream_tag in dream_tags
+            ]
+
+            dream_log_data = dream_log_singular_schema.dump(dream_log)
+            dream_log_data["tags"] = tag_plural_schema.dump(associated_tags)
+
+            dream_logs_with_tags.append(dream_log_data)
+
+        return make_response(jsonify(dream_logs_with_tags), 200)
 
     def post(self):
         if "user_id" not in session:
