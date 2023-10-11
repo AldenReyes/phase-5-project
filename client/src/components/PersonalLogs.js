@@ -17,9 +17,7 @@ export default function PersonalLogs() {
       fetch("/dream-logs")
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           const userLogs = data.filter((log) => log.user.id === userIdNumber);
-          console.log(userLogs);
           setLogs(userLogs);
         })
         .catch((err) => {
@@ -29,7 +27,7 @@ export default function PersonalLogs() {
   }, [user_id]);
 
   if (!user_id) {
-    return <h1>Please signup/log in to view your dream logs.</h1>;
+    return <h1>Please signup/log in order to view your dream logs.</h1>;
   }
 
   return (
