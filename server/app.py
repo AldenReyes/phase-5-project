@@ -87,8 +87,8 @@ dream_log_plural_schema = DreamLogSchema(many=True)
 
 class DreamLogs(Resource):
     def get(self):
-        dream_logs = DreamLog.query.all()
-        response = make_response(dream_log_plural_schema.dump(dream_logs), 200)
+        public_dream_logs = DreamLog.query.filter_by(is_public=True).all()
+        response = make_response(dream_log_plural_schema.dump(public_dream_logs), 200)
         return response
 
     def post(self):
