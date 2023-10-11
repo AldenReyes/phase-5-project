@@ -37,7 +37,6 @@ export default function Navbar() {
       },
     })
       .then((response) => {
-        console.log(response);
         if (response.status === 204) {
           showLogoutSuccess();
         } else {

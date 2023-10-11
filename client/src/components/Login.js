@@ -22,7 +22,7 @@ function showLoginSuccess() {
 }
 
 function showLoginFailure() {
-  toast.error("login failed, please try again", {
+  toast.error("Login failed, please try again", {
     position: "top-right",
     autoClose: 5000,
     hideProgressBar: false,
