@@ -8,6 +8,7 @@ import DreamLogs from "./PublicDreamLogs";
 import PersonalLogs from "./PersonalLogs";
 import CreateLog from "./CreateLog";
 import About from "./About";
+import "../styles/App.css";
 
 function App() {
   return (

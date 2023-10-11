@@ -7,13 +7,13 @@ function DreamLog({ log }) {
       <Card.Content>
         <Card.Header>{log.title}</Card.Header>
         <Card.Meta>
-          <span className="date">{log.date}</span>
+          <span className="date">{log.published_at}</span>
         </Card.Meta>
-        <Card.Description>{log.description}</Card.Description>
+        <Card.Description>{log.text_content}</Card.Description>
       </Card.Content>
       <Card.Content extra>
         <Icon name="user" />
-        {log.username}
+        {log.user["username"]}
       </Card.Content>
     </Card>
   );
