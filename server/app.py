@@ -123,15 +123,19 @@ class DreamLogsByID(Resource):
     def patch(self, id):
         dream_log = DreamLog.query.filter_by(id=id).first()
 
-        for attr in request.form:
-            setattr(dream_log, attr, request.form[attr])
+        if session.get('user_id') != dream_log.user_id:
+            return make_response({"message": "Unauthorized"}, 401)
+        else:
+            for attr in request.form:
+                if attr in request.form:
+                    setattr(dream_log, attr, request.form[attr])
 
-        db.session.add(dream_log)
-        db.session.commit()
+            db.session.add(dream_log)
+            db.session.commit()
 
-        response = make_response(dream_log_singular_schema.dump(dream_log), 200)
+            response = make_response(dream_log_singular_schema.dump(dream_log), 200)
 
-        return response
+            return response
 
     def delete(self, id):
         dream_log = DreamLog.query.filter_by(id=id).first()
