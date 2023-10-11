@@ -7,7 +7,7 @@ from models import User, DreamLog, Tag, DreamTag
 from datetime import datetime, timedelta
 
 
-# Schemas paired with respective classes
+# Schemas will be paired with respective classes
 class UserSchema(ma.SQLAlchemySchema):
     class Meta:
         model = User
@@ -75,6 +75,7 @@ class DreamLogSchema(ma.SQLAlchemySchema):
     rating = fields.Str(
         validate=validate.OneOf(["Good Dream", "Neutral Dream", "Bad Dream"])
     )
+    tags = fields.List(fields.Str(), required=False)
 
     published_at = ma.auto_field()
     edited_at = ma.auto_field()
@@ -121,6 +122,15 @@ class DreamLogs(Resource):
             rating=dream_log_data.get("rating", None),
             user_id=user_id,
         )
+
+        tag_names = data.get("tags", [])
+        for tag_name in tag_names:
+            tag = Tag.query.filter_by(name=tag_name).first()
+            if tag is None:
+                tag = Tag(name=tag_name)
+                db.session.add(tag)
+            new_dream_log.tags.append(tag)
+
         db.session.add(new_dream_log)
         db.session.commit()
 
@@ -280,8 +290,8 @@ class Login(Resource):
         user = User.query.filter_by(username=username).first()
 
         if user.authenticate(password):
-            session['user_id'] = user.id
             response = make_response(user_singular_schema.dump(user), 200)
+            session['user_id'] = user.id
             response.set_cookie("username", username)
             return response
         else:
