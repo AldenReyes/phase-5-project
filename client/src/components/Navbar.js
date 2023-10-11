@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Menu, Button } from "semantic-ui-react";
+import { Menu } from "semantic-ui-react";
 
 export default function Navbar() {
   return (
@@ -11,9 +11,7 @@ export default function Navbar() {
       <Menu.Item as={NavLink} to="/create" name="Create a Dream Log" />
       <Menu.Item as={NavLink} to="/about" name="About" />
       <Menu.Menu position="right">
-        <Menu.Item name="Logout" as={Button}>
-          Logout
-        </Menu.Item>
+        <Menu.Item name="Logout">Logout</Menu.Item>
       </Menu.Menu>
     </Menu>
   );
