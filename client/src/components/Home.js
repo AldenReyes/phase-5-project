@@ -12,7 +12,12 @@ export default function Home() {
 
   return (
     <div className="home">
-      <Image src="background.JPG" size="large" bordered />
+      <Image
+        src="background.JPG"
+        size="large"
+        alt="a person sleeping, dreaming of space"
+        bordered
+      />
       <h1>Welcome to Dream Logger</h1>
       <div>
         <button
