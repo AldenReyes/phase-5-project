@@ -81,11 +81,11 @@ export default function SignUp() {
             });
         }}
       >
-        {({ isSubmitting, handleChange, values }) => (
+        {({ handleChange, values }) => (
           <Form>
             <SemanticForm.Field>
               <label htmlFor="username">Username</label>
-              <input
+              <SemanticForm.Input
                 type="text"
                 id="username"
                 name="username"
@@ -97,7 +97,7 @@ export default function SignUp() {
 
             <SemanticForm.Field>
               <label htmlFor="password">Password</label>
-              <input
+              <SemanticForm.Input
                 type="password"
                 id="password"
                 name="password"
@@ -107,9 +107,7 @@ export default function SignUp() {
               <ErrorMessage name="password" component="div" />
             </SemanticForm.Field>
 
-            <Button type="submit" disabled={isSubmitting}>
-              Sign Up
-            </Button>
+            <Button type="submit">Sign Up</Button>
           </Form>
         )}
       </Formik>

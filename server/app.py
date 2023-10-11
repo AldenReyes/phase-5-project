@@ -280,7 +280,9 @@ class Login(Resource):
 
         if user.authenticate(password):
             session['user_id'] = user.id
-            return make_response(user_singular_schema.dump(user), 200)
+            response = make_response(user_singular_schema.dump(user), 200)
+            response.set_cookie("username", username)
+            return response
         else:
             return {"error": "Failed to login, check username or password"}, 401
 
