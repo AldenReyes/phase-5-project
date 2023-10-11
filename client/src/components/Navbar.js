@@ -11,11 +11,8 @@ export default function Navbar() {
       <Menu.Item as={NavLink} to="/create" name="Create a Dream Log" />
       <Menu.Item as={NavLink} to="/about" name="About" />
       <Menu.Menu position="right">
-        <Menu.Item name="Login">
-          <Button>Login</Button>
-        </Menu.Item>
-        <Menu.Item name="Logout">
-          <Button>Logout</Button>
+        <Menu.Item name="Logout" as={Button}>
+          Logout
         </Menu.Item>
       </Menu.Menu>
     </Menu>
