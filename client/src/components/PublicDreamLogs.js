@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Card } from "semantic-ui-react";
 import DreamLog from "./DreamLog";
-import "../styles/PublicDreamLogs.css";
+import "../styles/DreamLogs.css";
 
 export default function PublicDreamLogs() {
   const [dreamLogs, setDreamLogs] = useState([]);
@@ -9,7 +9,10 @@ export default function PublicDreamLogs() {
   useEffect(() => {
     fetch("/dream-logs")
       .then((res) => res.json())
-      .then((data) => setDreamLogs(data));
+      .then((data) => {
+        const publicLogs = data.filter((log) => log.is_public === true);
+        setDreamLogs(publicLogs);
+      });
   }, []);
 
   return (

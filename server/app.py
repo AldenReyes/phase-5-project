@@ -89,7 +89,7 @@ dream_log_plural_schema = DreamLogSchema(many=True)
 
 class DreamLogs(Resource):
     def get(self):
-        public_dream_logs = DreamLog.query.filter_by(is_public=True).all()
+        public_dream_logs = DreamLog.query.all()
         dream_logs_with_tags = []
 
         for dream_log in public_dream_logs:
@@ -289,9 +289,9 @@ class Login(Resource):
 
         user = User.query.filter_by(username=username).first()
 
-        if user.authenticate(password):
+        if user and user.authenticate(password):
             response = make_response(user_singular_schema.dump(user), 200)
-            session['user_id'] = user.id
+            response.set_cookie("user_id", str(user.id))
             response.set_cookie("username", username)
             return response
         else:
@@ -300,11 +300,13 @@ class Login(Resource):
 
 class Logout(Resource):
     def delete(self):
-        session['user_id'] = None
         response = make_response({}, 204)
 
         response.set_cookie(
             'username', '', expires=datetime.utcnow() - timedelta(days=1)
+        )
+        response.set_cookie(
+            'user_id', '', expires=datetime.utcnow() - timedelta(days=1)
         )
 
         return response
