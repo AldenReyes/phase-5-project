@@ -7,9 +7,7 @@ function DreamLog({ log, onEdit, onDelete, userId }) {
     <Card>
       <Card.Content>
         <Card.Header>{log.title}</Card.Header>
-        <Card.Meta>
-          <span className="date">{log.published_at}</span>
-        </Card.Meta>
+        <Card.Meta>{new Date(log.published_at).toLocaleDateString()}</Card.Meta>
         <Card.Description>{log.text_content}</Card.Description>
       </Card.Content>
       <Card.Content extra>
