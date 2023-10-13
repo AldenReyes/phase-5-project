@@ -5,7 +5,7 @@ import "../styles/DreamLogs.css";
 
 export default function PersonalDreamLogs() {
   const [logs, setLogs] = useState([]);
-  const [editingLog, setEditingLog] = useState(null);
+  const [updateStatus, setUpdateStatus] = useState(false);
 
   const user_id = document.cookie
     .split("; ")
@@ -27,7 +27,7 @@ export default function PersonalDreamLogs() {
           console.error("Failed to fetch logs: ", err);
         });
     }
-  }, [user_id]);
+  }, [user_id, updateStatus]);
 
   if (!user_id) {
     return <h1>Please signup/log in order to view your dream logs.</h1>;
@@ -47,14 +47,10 @@ export default function PersonalDreamLogs() {
       });
   }
 
-  function handleEdit(log) {
-    console.log("edit");
-  }
-
-  fetch(`/dream-logs/${userIdNumber}`);
   return (
     <Container>
       <h2>Your Dream Logs</h2>
+      <h3>Title / Content can be edited on click</h3>
       <Card.Group className="card-group">
         {logs.length === 0 ? (
           <h4>No logs found.</h4>
@@ -63,9 +59,10 @@ export default function PersonalDreamLogs() {
             <DreamLog
               key={log.id}
               log={log}
-              onEdit={handleEdit}
               onDelete={handleDelete}
               userId={userIdNumber}
+              updateStatus={updateStatus}
+              setUpdateStatus={setUpdateStatus}
             />
           ))
         )}

@@ -1,14 +1,72 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Icon, Label, Button } from "semantic-ui-react";
 import { v4 as uuid } from "uuid";
 
-function DreamLog({ log, onEdit, onDelete, userId }) {
+export default function DreamLog({
+  log,
+  onDelete,
+  userId,
+  updateStatus,
+  setUpdateStatus,
+}) {
+  const [editingField, setEditingField] = useState(null);
+  const [fieldValues, setFieldValues] = useState({
+    title: log.title,
+    text_content: log.text_content,
+  });
+
+  function handleEditField(fieldName) {
+    setEditingField(fieldName);
+  }
+
+  function handleBlur() {
+    fetch(`/dream-logs/${log.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(fieldValues),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setEditingField(null);
+        setUpdateStatus(!updateStatus);
+      })
+      .catch((error) => {
+        console.error("Failed to update log, please try again", error);
+      });
+  }
+
   return (
     <Card>
       <Card.Content>
-        <Card.Header>{log.title}</Card.Header>
+        {editingField === "title" ? (
+          <input
+            value={fieldValues.title}
+            onBlur={handleBlur}
+            onChange={(e) =>
+              setFieldValues({ ...fieldValues, title: e.target.value })
+            }
+          />
+        ) : (
+          <Card.Header onClick={() => handleEditField("title")}>
+            {log.title}
+          </Card.Header>
+        )}
         <Card.Meta>{new Date(log.published_at).toLocaleDateString()}</Card.Meta>
-        <Card.Description>{log.text_content}</Card.Description>
+        {editingField === "text_content" ? (
+          <textarea
+            value={fieldValues.text_content}
+            onBlur={handleBlur}
+            onChange={(e) =>
+              setFieldValues({ ...fieldValues, text_content: e.target.value })
+            }
+          />
+        ) : (
+          <Card.Description onClick={() => handleEditField("text_content")}>
+            {log.text_content}
+          </Card.Description>
+        )}
       </Card.Content>
       <Card.Content extra>
         <Icon name="user" />
@@ -27,9 +85,6 @@ function DreamLog({ log, onEdit, onDelete, userId }) {
         </div>
         {userId === log.user.id && (
           <>
-            <Button onClick={() => onEdit(log)} size="tiny" color="blue">
-              Edit
-            </Button>
             <Button onClick={() => onDelete(log.id)} size="tiny" color="red">
               Delete
             </Button>
@@ -39,5 +94,3 @@ function DreamLog({ log, onEdit, onDelete, userId }) {
     </Card>
   );
 }
-
-export default DreamLog;

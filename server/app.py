@@ -146,13 +146,14 @@ class DreamLogsByID(Resource):
 
     def patch(self, id):
         dream_log = DreamLog.query.filter_by(id=id).first()
+        json_data = request.json
 
         if session.get('user_id') != dream_log.user_id:
             return make_response({"message": "Unauthorized"}, 401)
         else:
-            for attr in request.form:
-                if attr in request.form:
-                    setattr(dream_log, attr, request.form[attr])
+            for attr, value in json_data.items():
+                if hasattr(dream_log, attr):
+                    setattr(dream_log, attr, value)
 
             db.session.add(dream_log)
             db.session.commit()
