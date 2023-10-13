@@ -6,7 +6,7 @@ import Home from "./Home";
 import Login from "./Login";
 import Signup from "./Signup";
 import DreamLogs from "./PublicDreamLogs";
-import PersonalLogs from "./PersonalLogs";
+import PersonalDreamLogs from "./PersonalDreamLogs";
 import CreateLog from "./CreateLog";
 import "../styles/App.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,7 +21,7 @@ function App() {
           <Route path="/login" component={Login} />
           <Route path="/signup" component={Signup} />
           <Route path="/dreamlogs" component={DreamLogs} />
-          <Route path="/personallogs" component={PersonalLogs} />
+          <Route path="/personallogs" component={PersonalDreamLogs} />
           <Route path="/create" component={CreateLog} />
         </Switch>
       </BrowserRouter>

@@ -3,7 +3,7 @@ import { Container, Card } from "semantic-ui-react";
 import DreamLog from "./DreamLog";
 import "../styles/DreamLogs.css";
 
-export default function PersonalLogs() {
+export default function PersonalDreamLogs() {
   const [logs, setLogs] = useState([]);
 
   const user_id = document.cookie
