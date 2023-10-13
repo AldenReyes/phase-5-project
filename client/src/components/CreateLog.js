@@ -5,6 +5,7 @@ import {
   Form as SemanticForm,
   Dropdown,
   Checkbox,
+  Label,
 } from "semantic-ui-react";
 import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
@@ -22,6 +23,11 @@ const validationSchema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
   text_content: Yup.string().required("Content is required"),
 });
+
+function handleTagRemove(tagToRemove, setFieldValue, values) {
+  const updatedTags = values.tags.filter((tag) => tag !== tagToRemove);
+  setFieldValue("tags", updatedTags);
+}
 
 export default function CreateLog() {
   const ratingOptions = ["Good Dream", "Neutral Dream", "Bad Dream"];
@@ -127,12 +133,17 @@ export default function CreateLog() {
             </SemanticForm.Field>
 
             <SemanticForm.Field>
-              <label>Current Tags Attached:</label>
+              <label>Current Tags Attached (click to remove):</label>
               <div>
                 {values.tags.map((tag) => (
-                  <span key={uuidv4()} style={{ marginRight: "10px" }}>
+                  <Label
+                    key={uuidv4()}
+                    style={{ marginRight: "10px" }}
+                    color="blue"
+                    onClick={() => handleTagRemove(tag, setFieldValue, values)}
+                  >
                     {tag}
-                  </span>
+                  </Label>
                 ))}
               </div>
             </SemanticForm.Field>
