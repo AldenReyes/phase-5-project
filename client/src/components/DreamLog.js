@@ -1,8 +1,8 @@
 import React from "react";
-import { Card, Icon, Label } from "semantic-ui-react";
+import { Card, Icon, Label, Button } from "semantic-ui-react";
 import { v4 as uuid } from "uuid";
 
-function DreamLog({ log }) {
+function DreamLog({ log, onEdit, onDelete, userId }) {
   return (
     <Card>
       <Card.Content>
@@ -27,6 +27,16 @@ function DreamLog({ log }) {
               ))
             : "No tags available"}
         </div>
+        {userId === log.user.id && (
+          <>
+            <Button onClick={() => onEdit(log)} size="tiny" color="blue">
+              Edit
+            </Button>
+            <Button onClick={() => onDelete(log.id)} size="tiny" color="red">
+              Delete
+            </Button>
+          </>
+        )}
       </Card.Content>
     </Card>
   );

@@ -5,11 +5,14 @@ import "../styles/DreamLogs.css";
 
 export default function PersonalDreamLogs() {
   const [logs, setLogs] = useState([]);
+  const [editingLog, setEditingLog] = useState(null);
 
   const user_id = document.cookie
     .split("; ")
     .find((row) => row.startsWith("user_id="))
     ?.split("=")[1];
+
+  const userIdNumber = Number(user_id);
 
   useEffect(() => {
     if (user_id) {
@@ -30,6 +33,25 @@ export default function PersonalDreamLogs() {
     return <h1>Please signup/log in order to view your dream logs.</h1>;
   }
 
+  function handleDelete(logId) {
+    fetch(`/dream-logs/${logId}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (response.ok) {
+          setLogs(logs.filter((log) => log.id !== logId));
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to delete log: ", error);
+      });
+  }
+
+  function handleEdit(log) {
+    console.log("edit");
+  }
+
+  fetch(`/dream-logs/${userIdNumber}`);
   return (
     <Container>
       <h2>Your Dream Logs</h2>
@@ -37,7 +59,15 @@ export default function PersonalDreamLogs() {
         {logs.length === 0 ? (
           <h4>No logs found.</h4>
         ) : (
-          logs.map((log) => <DreamLog key={log.id} log={log} />)
+          logs.map((log) => (
+            <DreamLog
+              key={log.id}
+              log={log}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              userId={userIdNumber}
+            />
+          ))
         )}
       </Card.Group>
     </Container>
