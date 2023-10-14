@@ -65,7 +65,18 @@ To get a local copy up and running follow these steps.
 ```sh
 git@github.com:AldenReyes/phase-5-project-dream-logger.git
 ```
-2. From there, navigate to the root folder in your terminal and run the shell following shell commands. These commands will install and start up a python virtual environment, then install dependencies, and then create a database of data to explore with seed.py:
+2. In order for certain functions to operate, a secret key must be created in a user made `.env` file. Inside the root directory run the following two commands:
+```sh
+touch .env
+
+python -c 'import os; print(os.urandom(16))'
+```
+and inside your `.env` file, make a variable "SECRET_KEY" equal to the value returned by the python command. Your `.env` file should look like
+```
+SECRET_KEY={Value returned by above python command}
+``` 
+
+2. From there, (ensuring you are in the root directory) run the shell following shell commands. These commands will install and start up a python virtual environment, then install dependencies, and then create a database of data to explore with seed.py:
 ```sh
  pipenv install; pipenv shell
  npm install --prefix client
@@ -94,6 +105,10 @@ Users will be able to view and create personal dream log entries after sign up a
 <img src="images/create_log.png">
 
 Navigation is provided by the top navbar and users will be able to fill out a form in order to create a dream log entry
+
+<img src="images/personal_view.png">
+
+Once a user creates a log, they can manage edit and delete functionality from the personal dream logs page. A user can click either the title or content body in order to change those fields, or click the delete button to remove the log entirely.
 
 ---
 
